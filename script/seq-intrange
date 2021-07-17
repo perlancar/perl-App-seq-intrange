@@ -53,13 +53,15 @@ my $re_num = qr/\A-?\d+(\.\d+)?\z/;
 
 @ARGV == 1 or die "seq-intrange: Please specify intrange specification\n";
 my $format;
-my $iter = intrange_iter($ARGV[0]);
+my $iter = intrange_iter({allow_dotdot=>1}, $ARGV[0]);
+my $longest_digseq = ""; while ($ARGV[0] =~ /([0-9]+)/g) { $longest_digseq = $1 if length($longest_digseq) < length($1) }
+#print "D:longest_digseq=<$longest_digseq>\n";
+
 while (defined (my $x = $iter->())) {
     unless (defined $format) {
         $format = $Opts{format};
         if (!defined $format && $Opts{equal_width}) {
-            $format = "%04". # XXX we need to extract the largest number
-                "d";
+            $format = "%0". length($longest_digseq) . "d";
         }
         if (!defined $format) {
             $format = "%s";
