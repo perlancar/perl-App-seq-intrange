@@ -1,0 +1,108 @@
+#!perl
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+use IntRange::Iter qw(intrange_iter);
+
+my %Opts = (
+    separator => "\n",
+    format => undef,
+    equal_width => 0,
+);
+Getopt::Long::Configure('bundling', 'no_ignore_case',
+                        # because we want to allow negative numbers without error
+                        'pass_through',
+                    );
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_';
+Usage: seq-intrange [options] <intrange>
+       seq-intrange --help, -h, -?
+       seq-intrange --version, -v
+
+Examples:
+  % seq-intrange 1,5-10,15
+
+Options:
+  --format=s, -f
+  --equal-width, -w
+  --separator=s, -s
+
+_
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "seq-intrange version ", ($main::VERSION || "dev"),
+            ($main::DATE ? " ($main::DATE)" : ""), "\n";
+        exit 0;
+    },
+    'format|f=s' => \$Opts{format},
+    'equal-width|w' => \$Opts{equal_width},
+    'separator|s=s' => \$Opts{separator},
+);
+
+my $re_num = qr/\A-?\d+(\.\d+)?\z/;
+
+@ARGV == 1 or die "seq-intrange: Please specify intrange specification\n";
+my $format;
+my $iter = intrange_iter($ARGV[0]);
+while (defined (my $x = $iter->())) {
+    unless (defined $format) {
+        $format = $Opts{format};
+        if (!defined $format && $Opts{equal_width}) {
+            $format = "%04". # XXX we need to extract the largest number
+                "d";
+        }
+        if (!defined $format) {
+            $format = "%s";
+        }
+    }
+    printf "${format}%s", $x, $Opts{separator};
+}
+
+# ABSTRACT: Like seq, but accepts intrange specification (e.g. 1,5-10,15)
+# PODNAME:
+
+=head1 SYNOPSIS
+
+ % seq-intrange 1,5-10,15
+
+
+=head1 DESCRIPTION
+
+This variant of B<seq> accept intrange specification (e.g. 1,5-10,15).
+
+
+=head1 OPTIONS
+
+=head2 --format=s, -f
+
+=head2 --separator=s, -s
+
+=head2 --equal-width, -w
+
+=head2 --help, -h, -?
+
+=head2 --version
+
+
+=head1 SEE ALSO
+
+B<seq>, the Unix utility.
+
+Other seq variants or themes I've written: L<seq-pl> (from L<App::seq::pl),
+L<dateseq> (from L<App::dateseq>) which can generate date sequences, including
+infinite ones, L<seq-pericmd> (from L<App::SeqPericmd>) which lets you customize
+increment/step (e.g. 0.5) or limit the number of items.
+
+L<Sah::Schema::IntRange>, L<Regexp::Pattern::IntRange>, L<IntRange::Iter>.
+
+=cut
