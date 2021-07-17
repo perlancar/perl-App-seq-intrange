@@ -98,7 +98,7 @@ This variant of B<seq> accept intrange specification (e.g. 1,5-10,15).
 
 B<seq>, the Unix utility.
 
-Other seq variants or themes I've written: L<seq-pl> (from L<App::seq::pl),
+Other seq variants or themes I've written: L<seq-pl> (from L<App::seq::pl>),
 L<dateseq> (from L<App::dateseq>) which can generate date sequences, including
 infinite ones, L<seq-pericmd> (from L<App::SeqPericmd>) which lets you customize
 increment/step (e.g. 0.5) or limit the number of items.
